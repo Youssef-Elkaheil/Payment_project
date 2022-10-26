@@ -1,6 +1,8 @@
-#include "server.h"
-#include "string.h"
+#include <stdio.h>
+#include <string.h>
 #include "../card/card.h"
+#include "../terminal/terminal.h"
+#include "server.h"
 
 ST_accountsDB_t account_database[255] = {{1000.0, RUNNING, "0132456789____01"}, {2000.0, BLOCKED, "0132456789____02"},
 										 {3000.0, RUNNING, "0132456789____03"}, {4000.0, BLOCKED, "0132456789____04"},
@@ -17,27 +19,34 @@ EN_transState_t recieveTransactionData(ST_transaction_t *transData)
 {
 	ST_accountsDB_t *accountRefrence;
 
-	if(isValidAccount(transData->cardHolderData,accountRefrence) == ACCOUNT_NOT_FOUND)
+	if(isValidAccount(&transData->cardHolderData,accountRefrence) == ACCOUNT_NOT_FOUND)
 	{
+		transData->transState = FRAUD_CARD; 
 		return FRAUD_CARD;
 	}
 
-	if(isBlockedAccount(transData->cardHolderData,accountRefrence) == BLOCKED_ACCOUNT)
+	if(isBlockedAccount(accountRefrence) == BLOCKED_ACCOUNT)
 	{
+		transData->transState =  DECLINED_STOLEN_CARD;
 		return DECLINED_STOLEN_CARD;
 	}
 
-	if(isAmountAvailable(transData->cardHolderData,accountRefrence) == LOW_BALANCE)
+	if(isAmountAvailable(&transData->terminalData,accountRefrence) == LOW_BALANCE)
 	{
+		transData->transState =  DECLINED_INSUFFECIENT_FUND;
 		return DECLINED_INSUFFECIENT_FUND;
 	}
 
 	if(saveTransaction(transData) == SAVING_FAILED)
 	{
-		return INTERNAL_SERVER_ERROR
+		transData->transState =  INTERNAL_SERVER_ERROR;
+
+		return INTERNAL_SERVER_ERROR;
 	}
 	else if(saveTransaction(transData) == SERVER_OK)
 	{	
+		transData->transState =  APPROVED;
+		accountRefrence->balance = accountRefrence->balance - transData->terminalData.transAmount;
 		return APPROVED;
 	}
 }

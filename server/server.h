@@ -1,7 +1,5 @@
 #ifndef SERVER_H
 #define SERVER_H
-#include "../card/card.h"
-#include "../terminal/terminal.h"
 
 
 typedef enum EN_transState_t
@@ -11,10 +9,10 @@ typedef enum EN_transState_t
 
 typedef struct ST_transaction_t
 {
-     ST_cardData_t cardHolderData;
-     ST_terminalData_t terminalData;
-     EN_transState_t transState;
-     unsigned long int transactionSequenceNumber;
+    ST_cardData_t cardHolderData;
+    ST_terminalData_t terminalData;
+    EN_transState_t transState;
+    unsigned long int transactionSequenceNumber;
 }ST_transaction_t;
 
 typedef enum EN_serverError_t 

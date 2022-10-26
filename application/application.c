@@ -1,64 +1,88 @@
-#include "application.h"
-#include "../server/server.h"
 #include<stdio.h>
+#include "../card/card.h"
+#include "../terminal/terminal.h"
+#include "../server/server.h"
+#include "application.h"
+
+static void printTransactionState(EN_transState_t state)
+{
+	switch (state)
+	{
+	case APPROVED:
+		printf("APPROVED\n");
+		break;
+
+		case DECLINED_INSUFFECIENT_FUND:
+		printf("\n");
+		break;
+
+		case DECLINED_STOLEN_CARD:
+		printf("DECLINED_INSUFFECIENT_FUND\n");
+		break;
+
+		case FRAUD_CARD:
+		printf("\n");
+		break;
+
+		case INTERNAL_SERVER_ERROR:
+		printf("FRAUD_CARD\n");
+		break;
 
 
+	default:
+		printf("Undefined States\n");
+		break;
+	}
+}
 
-
-
-//ST_cardData_t customer_card = { "ahmed maged alia ","1234567890qweert","5/12" };
-ST_transaction_t transaction_data = { {"ahmed maged alia ","1234567890qweert","5/12"},{300,30000,"15/7/2022"},0,0 };
 void appStart(void)
 {
-	ST_cardData_t customer_card;
-	ST_cardData_t* ptr_customer_card = &customer_card;
-	ST_terminalData_t customer_terminal;
-	ST_terminalData_t* ptr_customer_terminal = &customer_terminal;
+	ST_transaction_t newTransaction;
+	ST_accountsDB_t accountrefrance;
 	EN_terminalError_t termerror;
 	EN_cardError_t carderror;
-	printf("ENTER Holder name:  ");
-	fgets(ptr_customer_card->cardHolderName, sizeof(ptr_customer_card->cardHolderName),stdin);
-	carderror = getCardHolderName(ptr_customer_card);
-	if (carderror == OK)
-	{
-		printf("valid name\nENTER Card expiratory date:  "); 
-		fgets(ptr_customer_card->cardExpirationDate, sizeof(ptr_customer_card->cardExpirationDate), stdin);
-		carderror = getCardExpiryDate(ptr_customer_card);
+	EN_transState_t transState;
+	while (1)
+	{	
+		printf("ENTER Holder name:  ");
+		scanf("%s",newTransaction.cardHolderData.cardHolderName);
+		carderror = getCardHolderName(&newTransaction.cardHolderData);
 		if (carderror == OK)
 		{
-			printf("valid Card expiratory date\nENTER primary account number:  ");
-			fgets(ptr_customer_card->primaryAccountNumber, sizeof(ptr_customer_card->primaryAccountNumber), stdin);
-			carderror = getCardPAN(ptr_customer_card);
+			printf("valid name\nENTER Card Expiration date:  "); 
+			scanf("%s",newTransaction.cardHolderData.cardExpirationDate);
+			carderror = getCardExpiryDate(&newTransaction.cardHolderData);
 			if (carderror == OK)
 			{
-				printf("ENTER transaction date in format  DD/MM/YYYY, e.g 25/06/2022.:  ");
-				fgets(ptr_customer_terminal->transactionDate, sizeof(ptr_customer_terminal->transactionDate), stdin);
-				termerror = getTransactionDate(ptr_customer_terminal);
-				if (termerror == OK_TER)
+				printf("valid Card Expiration date\nENTER primary account number:  ");
+				scanf("%s",newTransaction.cardHolderData.primaryAccountNumber);
+				carderror = getCardPAN(&newTransaction.cardHolderData);
+				if (carderror == OK)
 				{
-					termerror = isCardExpired(customer_card, customer_terminal);
-					if (termerror == EXPIRED_CARD)
+					printf("ENTER transaction date in format  DD/MM/YYYY, e.g 25/06/2022.:  ");
+					scanf("%s",newTransaction.terminalData.transactionDate);
+					termerror = getTransactionDate(&newTransaction.terminalData);
+					if (termerror == TERMINAL_OK)
 					{
-						printf("EXPIRED_CARD");
-					}
-					else if (termerror == OK_TER)
-					{
-
+						termerror = isCardExpired(&newTransaction.cardHolderData, &newTransaction.terminalData);
+						if (termerror == EXPIRED_CARD)
+						{
+							printf("EXPIRED_CARD");
+							continue;
+						}
+						else if (termerror == TERMINAL_OK)
+						{
+							transState = recieveTransactionData(&newTransaction);
+							printTransactionState(transState);
+						}else
+						{
+							printf("EXCEED_MAX_AMOUNT");
+							continue;
+						}
 					}
 				}
-				
-				//for (int i = 0; i < 255; i++)
-				//{
-					//if(ptr_customer_card->primaryAccountNumber== transaction_database[i].c)
-				//}
 			}
-
-
 		}
 	}
-	
-	
-
-
-	
 }
+

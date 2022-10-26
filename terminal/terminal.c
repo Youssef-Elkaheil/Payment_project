@@ -1,6 +1,6 @@
-#include "terminal.h"
 #include <string.h>
-
+#include "../card/card.h"
+#include "terminal.h"
 
 EN_terminalError_t getTransactionDate(ST_terminalData_t* termData)
 {

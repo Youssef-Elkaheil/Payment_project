@@ -1,8 +1,5 @@
-#include "application/application.h"
 #include<stdio.h>
-#include"server/server.h"
-
-
+#include "application/application.h"
 
 int main(void)
 {
