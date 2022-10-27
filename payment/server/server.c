@@ -23,21 +23,23 @@ EN_transState_t recieveTransactionData(ST_transaction_t *transData)
 	if(serverError == ACCOUNT_NOT_FOUND)
 	{
 		transData->transState = FRAUD_CARD;
-		return FRAUD_CARD;
-
-	}
-		printf("%s \n",accountRefrence->primaryAccountNumber);
-
-	if(isBlockedAccount(accountRefrence) == BLOCKED_ACCOUNT)
+        if(saveTransaction(transData) == SERVER_OK)
+        {
+            return FRAUD_CARD;
+        }else
+        {
+            return INTERNAL_SERVER_ERROR;
+        }
+	}else if(isBlockedAccount(accountRefrence) == BLOCKED_ACCOUNT)
 	{
 		transData->transState =  DECLINED_STOLEN_CARD;
-		return DECLINED_STOLEN_CARD;
-	}
-
-	if(isAmountAvailable(&transData->terminalData,accountRefrence) == LOW_BALANCE)
-	{
-		transData->transState =  DECLINED_INSUFFECIENT_FUND;
-		return DECLINED_INSUFFECIENT_FUND;
+        if(saveTransaction(transData) == SERVER_OK)
+        {
+            return DECLINED_STOLEN_CARD;
+        }else
+        {
+            return INTERNAL_SERVER_ERROR;
+        }
 	}
 
     /* set max amount globally by a macro */
@@ -47,16 +49,32 @@ EN_transState_t recieveTransactionData(ST_transaction_t *transData)
         return INTERNAL_SERVER_ERROR;
     }
 
-	if(saveTransaction(transData) == SERVER_OK)
+	if(isAmountAvailable(&transData->terminalData,accountRefrence) == LOW_BALANCE)
 	{
-		transData->transState =  APPROVED;
-		accountRefrence->balance = accountRefrence->balance - transData->terminalData.transAmount;
-		return APPROVED;
+		transData->transState =  DECLINED_INSUFFECIENT_FUND;
+
+        if(saveTransaction(transData) == SERVER_OK)
+        {
+            return DECLINED_INSUFFECIENT_FUND;
+        }else
+        {
+            return INTERNAL_SERVER_ERROR;
+        }
 	}
 
-    transData->transState =  INTERNAL_SERVER_ERROR;
+    /* Approved */
+    transData->transState =  APPROVED;
+    accountRefrence->balance = accountRefrence->balance - transData->terminalData.transAmount;
 
-    return INTERNAL_SERVER_ERROR;
+	if(saveTransaction(transData) == SERVER_OK)
+	{
+		return APPROVED;
+	}else
+	{
+        return INTERNAL_SERVER_ERROR;
+
+	}
+
 
 }
 
@@ -107,12 +125,12 @@ EN_serverError_t isAmountAvailable(ST_terminalData_t *termData, ST_accountsDB_t 
 
 EN_serverError_t saveTransaction(ST_transaction_t *transData)
 {
-	Global_SequanceNumber++;
 
 		if(Global_SequanceNumber <255)
 		{
 			transaction_database[Global_SequanceNumber] = *transData;
 			transaction_database[Global_SequanceNumber].transactionSequenceNumber = Global_SequanceNumber;
+            Global_SequanceNumber++;
 			return SERVER_OK;
 		}
 
@@ -133,7 +151,8 @@ void listSavedTransactions(void)
 		printf("Transaction Sequence Number: %d\n", transaction_database[i].transactionSequenceNumber);
 		printf("Transaction Date: %s\n", transaction_database[i].terminalData.transactionDate);
 		printf("Transaction Amount: %f\n", transaction_database[i].terminalData.transAmount);
-		printf("Transaction State: %d \n", transaction_database[i].transState);
+		printf("Transaction State: ");
+		printTransactionState(transaction_database[i].transState)
 		printf("Terminal Max Amount: %f\n", transaction_database[i].terminalData.maxTransAmount);
 		printf("Card holder Name: %s\n", transaction_database[i].cardHolderData.cardHolderName);
 		printf("PAN:\n %s",transaction_database[i].cardHolderData.primaryAccountNumber);
@@ -167,22 +186,16 @@ void recieveTransactionDataTest(void)
 
     /* DECLINED_INSUFFECIENT_FUND */
 	strcpy(testTransaction.cardHolderData.primaryAccountNumber, "0132456789____01");
+	testTransaction.terminalData.transAmount = 1500.0;
 	printf("test case 3: DECLINED_INSUFFECIENT_FUND\n");
 	printf("input data: %s\n",testTransaction.cardHolderData.primaryAccountNumber);
 	printf("expected result: %d\n",DECLINED_INSUFFECIENT_FUND);
 	printf("Actual result: %d\n\n",recieveTransactionData(&testTransaction));
 
-	    /* INTERNAL_SERVER_ERROR*/
-	strcpy(testTransaction.cardHolderData.primaryAccountNumber, "0132456789____01");
-	printf("test case 4: INTERNAL_SERVER_ERROR\n");
-	printf("input data: %s\n",testTransaction.cardHolderData.primaryAccountNumber);
-	printf("expected result: %d\n",INTERNAL_SERVER_ERROR);
-	printf("Actual result: %d\n\n",recieveTransactionData(&testTransaction));
-
-
 	 /* APPROVED */
 	strcpy(testTransaction.cardHolderData.primaryAccountNumber, "0132456789____01");
-	printf("test case 5: APPROVED\n");
+	testTransaction.terminalData.transAmount = 500.0;
+	printf("test case 4: APPROVED\n");
 	printf("input data: %s\n",testTransaction.cardHolderData.primaryAccountNumber);
 	printf("expected result: %d\n",APPROVED);
 	printf("Actual result: %d\n\n",recieveTransactionData(&testTransaction));

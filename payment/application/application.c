@@ -75,8 +75,9 @@ void appStart(void)
                             termerror = isCardExpired(&newTransaction.cardHolderData, &newTransaction.terminalData);
                             if (termerror == TERMINAL_OK)
                             {
+                                printf("ENTER transaction amount:  ");
+                                scanf("%f",&newTransaction.terminalData.transAmount);
                                 transState = recieveTransactionData(&newTransaction);
-//                                printf("\n%d\n",transState);
                                 printTransactionState(transState);
                             }else
                             {

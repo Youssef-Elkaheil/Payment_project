@@ -6,7 +6,6 @@
 
 int main(void)
 {
-    //	appStart();
-    recieveTransactionDataTest();
+    	appStart();
 	return 0;
 }
