@@ -31,7 +31,7 @@ EN_cardError_t getCardExpiryDate(ST_cardData_t* cardData)
 					return WRONG_EXP_DATE;
 				}
 			break;
-		
+
 		default:
 			return WRONG_EXP_DATE;
 			break;
@@ -52,15 +52,13 @@ EN_cardError_t getCardPAN(ST_cardData_t* cardData)
 		return WRONG_PAN;
 }
 
-#define TEST_CARD_FILE 0
-
-#if TEST_CARD_FILE == 1
 
 #include <stdio.h>
 
-static void getCardHolderNametest(void)
+void getCardHolderNametest(void)
 {
 	ST_cardData_t card;
+	printf("test Function: getCardHolderName \n\n");
 	/* input <20 char*/
 	strcpy(card.cardHolderName, "ayamahmoudsalama");
 	printf("test case 1: \n");
@@ -97,9 +95,10 @@ static void getCardHolderNametest(void)
 	printf("Actual result: %d\n\n",getCardHolderName(&card));
 }
 
-static void getCardExpiryDatetest(void)
+void getCardExpiryDatetest(void)
 {
 	ST_cardData_t card;
+	printf("test Function: getCardExpiryDate \n\n");
 	/* input <5 char*/
 	strcpy(card.cardExpirationDate, "12/5");
 	printf("test case 1: \n");
@@ -127,7 +126,7 @@ static void getCardExpiryDatetest(void)
 	printf("input data: %s\n",card.cardExpirationDate);
 	printf("expected result: %d\n",OK);
 	printf("Actual result: %d\n\n",getCardExpiryDate(&card));
-	
+
 	/*months > 12 */
 	strcpy(card.cardExpirationDate, "30/24");
 	printf("test case 5: \n");
@@ -144,9 +143,10 @@ static void getCardExpiryDatetest(void)
 
 }
 
-static void getCardPANtest(void)
+void getCardPANtest(void)
 {
 		ST_cardData_t card;
+    printf("test Function: getCardPAN \n\n");
 	/* input <16 char*/
 	strcpy(card.primaryAccountNumber, "0123456789");
 	printf("test case 1: \n");
@@ -182,20 +182,3 @@ static void getCardPANtest(void)
 	printf("expected result: %d\n",WRONG_PAN);
 	printf("Actual result: %d\n\n",getCardPAN(&card));
 }
-
-
-
-
-/* test*/
-void main (void)
-{
-	printf("Holder name test\n\n");
-	getCardHolderNametest();
-	printf("expiration date test\n\n");
-	getCardExpiryDatetest();
-	printf("PAN test\n\n");
-	getCardPANtest();
-
-}
-
-#endif

@@ -15,14 +15,14 @@ typedef struct ST_transaction_t
     unsigned long int transactionSequenceNumber;
 }ST_transaction_t;
 
-typedef enum EN_serverError_t 
+typedef enum EN_serverError_t
 {
     SERVER_OK, SAVING_FAILED, TRANSACTION_NOT_FOUND, ACCOUNT_NOT_FOUND, LOW_BALANCE, BLOCKED_ACCOUNT
 }EN_serverError_t ;
 
 typedef enum EN_accountState_t
 {
-    BLOCKED, RUNNING 
+    BLOCKED, RUNNING
 }EN_accountState_t;
 
 typedef struct ST_accountsDB_t
@@ -39,6 +39,10 @@ EN_serverError_t isBlockedAccount(ST_accountsDB_t *accountRefrence);
 EN_serverError_t isAmountAvailable(ST_terminalData_t *termData, ST_accountsDB_t *accountRefrence);
 EN_serverError_t saveTransaction(ST_transaction_t *transData);
 void listSavedTransactions(void);
+
+/** test functions  **/
+
+void recieveTransactionDataTest(void);
 
 
 #endif // !SERVER_H

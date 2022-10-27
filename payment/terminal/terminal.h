@@ -21,4 +21,11 @@ EN_terminalError_t isBelowMaxAmount(ST_terminalData_t* termData);
 EN_terminalError_t setMaxAmount(ST_terminalData_t* termData);
 EN_terminalError_t isValidCardPAN(ST_cardData_t* cardData);
 
+/*test functions */
+void getTransactionDateTest(void);
+void isCardExpiredTest(void);
+void getTransactionAmountTest(void);
+void isBelowMaxAmountTest(void);
+void setMaxAmountTest(void);
+
 #endif // TERMINAL_H

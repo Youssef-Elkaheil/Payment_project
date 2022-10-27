@@ -21,7 +21,7 @@ EN_transState_t recieveTransactionData(ST_transaction_t *transData)
 
 	if(isValidAccount(&transData->cardHolderData,accountRefrence) == ACCOUNT_NOT_FOUND)
 	{
-		transData->transState = FRAUD_CARD; 
+		transData->transState = FRAUD_CARD;
 		return FRAUD_CARD;
 	}
 
@@ -36,18 +36,16 @@ EN_transState_t recieveTransactionData(ST_transaction_t *transData)
 		transData->transState =  DECLINED_INSUFFECIENT_FUND;
 		return DECLINED_INSUFFECIENT_FUND;
 	}
-
-	if(saveTransaction(transData) == SAVING_FAILED)
+	if(saveTransaction(transData) == SERVER_OK)
+	{
+		transData->transState =  APPROVED;
+		accountRefrence->balance = accountRefrence->balance - transData->terminalData.transAmount;
+		return APPROVED;
+	}else
 	{
 		transData->transState =  INTERNAL_SERVER_ERROR;
 
 		return INTERNAL_SERVER_ERROR;
-	}
-	else if(saveTransaction(transData) == SERVER_OK)
-	{	
-		transData->transState =  APPROVED;
-		accountRefrence->balance = accountRefrence->balance - transData->terminalData.transAmount;
-		return APPROVED;
 	}
 }
 
@@ -105,14 +103,19 @@ EN_serverError_t saveTransaction(ST_transaction_t *transData)
 			transaction_database[Global_SequanceNumber].transactionSequenceNumber = Global_SequanceNumber;
 			return SERVER_OK;
 		}
-	
+
 	/* database full */
 	return SAVING_FAILED;
 }
 
 void listSavedTransactions(void)
 {
-	for (int i = 0; i <= Global_SequanceNumber; i++)
+    if(Global_SequanceNumber ==0)
+    {
+        printf("List Empty\n\n");
+        return;
+    }
+	for (int i = 0; i < Global_SequanceNumber; i++)
 	{
 		printf("#########################\n");
 		printf("Transaction Sequence Number: %d\n", transaction_database[i].transactionSequenceNumber);
@@ -120,11 +123,66 @@ void listSavedTransactions(void)
 		printf("Transaction Amount: %f\n", transaction_database[i].terminalData.transAmount);
 		printf("Transaction State: %d \n", transaction_database[i].transState);
 		printf("Terminal Max Amount: %f\n", transaction_database[i].terminalData.maxTransAmount);
-		printf("Cardholder Name: %s\n", transaction_database[i].cardHolderData.cardHolderName);
+		printf("Card holder Name: %s\n", transaction_database[i].cardHolderData.cardHolderName);
 		printf("PAN:\n %s",transaction_database[i].cardHolderData.primaryAccountNumber);
 		printf("Card Expiration Date: %s\n",transaction_database[i].cardHolderData.cardExpirationDate);
-		printf("#########################\n");
-		
+		printf("#########################\n\n");
+
 	}
-	
+}
+
+
+void recieveTransactionDataTest(void)
+{
+  ST_terminalData_t testTerminal;
+    printf("test Function: recieveTransactionData \n\n");
+	/* input <10 char*/
+	strcpy(testTerminal.transactionDate, "25/24/20");
+	printf("test case 1: \n");
+	printf("input data: %s\n",testTerminal.transactionDate);
+	printf("expected result: %d\n",WRONG_DATE);
+	printf("Actual result: %d\n\n",getTransactionDate(&testTerminal));
+
+    /* input >10 char*/
+	strcpy(testTerminal.transactionDate, "025/024/2022");
+	printf("test case 2: input >10 char\n");
+	printf("input data: %s\n",testTerminal.transactionDate);
+	printf("expected result: %d\n",WRONG_DATE);
+	printf("Actual result: %d\n\n",getTransactionDate(&testTerminal));
+
+    /* input char[2] != '/' */
+	strcpy(testTerminal.transactionDate, "025/4/2022");
+	printf("test case 3: input char[2] != '/'\n");
+	printf("input data: %s\n",testTerminal.transactionDate);
+	printf("expected result: %d\n",WRONG_DATE);
+	printf("Actual result: %d\n\n",getTransactionDate(&testTerminal));
+
+	    /* input char[5] != '/' */
+	strcpy(testTerminal.transactionDate, "02/004/2022");
+	printf("test case 4: input char[5] != '/'\n");
+	printf("input data: %s\n",testTerminal.transactionDate);
+	printf("expected result: %d\n",WRONG_DATE);
+	printf("Actual result: %d\n\n",getTransactionDate(&testTerminal));
+
+
+	 /* months input 32 day */
+	strcpy(testTerminal.transactionDate, "32/01/2022");
+	printf("test case 5: months input 32 day\n");
+	printf("input data: %s\n",testTerminal.transactionDate);
+	printf("expected result: %d\n",WRONG_DATE);
+	printf("Actual result: %d\n\n",getTransactionDate(&testTerminal));
+
+	 /* months with 30 days input 31*/
+	strcpy(testTerminal.transactionDate, "31/04/2022");
+	printf("test case 6: months with 30 days input 31\n");
+	printf("input data: %s\n",testTerminal.transactionDate);
+	printf("expected result: %d\n",WRONG_DATE);
+	printf("Actual result: %d\n\n",getTransactionDate(&testTerminal));
+
+	/* February input 30*/
+	strcpy(testTerminal.transactionDate, "30/02/2022");
+	printf("test case 7: February input 30\n");
+	printf("input data: %s\n",testTerminal.transactionDate);
+	printf("expected result: %d\n",WRONG_DATE);
+	printf("Actual result: %d\n\n",getTransactionDate(&testTerminal));
 }

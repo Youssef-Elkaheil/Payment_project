@@ -1,0 +1,41 @@
+# depslib dependency file v1.0
+1666878346 source:c:\users\youssef\desktop\payment\card\card.c
+	"card.h"
+	<string.h>
+	<stdio.h>
+
+1666877611 c:\users\youssef\desktop\payment\card\card.h
+
+1666883613 source:c:\users\youssef\desktop\payment\source.c
+	<stdio.h>
+	"card/card.h"
+	"terminal/terminal.h"
+	"server/server.h"
+	"application/application.h"
+
+1666818854 c:\users\youssef\desktop\payment\application\application.h
+
+1666882410 source:c:\users\youssef\desktop\payment\terminal\terminal.c
+	<stdio.h>
+	<string.h>
+	"../card/card.h"
+	"terminal.h"
+
+1666880528 c:\users\youssef\desktop\payment\terminal\terminal.h
+
+1666873499 source:c:\users\youssef\desktop\payment\server\server.c
+	<stdio.h>
+	<string.h>
+	"../card/card.h"
+	"../terminal/terminal.h"
+	"server.h"
+
+1666818881 c:\users\youssef\desktop\payment\server\server.h
+
+1666877261 source:c:\users\youssef\desktop\payment\application\application.c
+	<stdio.h>
+	"../card/card.h"
+	"../terminal/terminal.h"
+	"../server/server.h"
+	"application.h"
+
