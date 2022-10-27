@@ -6,7 +6,7 @@
 
 int main(void)
 {
-	appStart();
-//setMaxAmountTest();
+    //	appStart();
+    recieveTransactionDataTest();
 	return 0;
 }

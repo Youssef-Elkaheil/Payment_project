@@ -1,6 +1,7 @@
 #ifndef SERVER_H
 #define SERVER_H
 
+#define MAX_AMOUNT 4000.0
 
 typedef enum EN_transState_t
 {
@@ -12,7 +13,7 @@ typedef struct ST_transaction_t
     ST_cardData_t cardHolderData;
     ST_terminalData_t terminalData;
     EN_transState_t transState;
-    unsigned long int transactionSequenceNumber;
+    int transactionSequenceNumber;
 }ST_transaction_t;
 
 typedef enum EN_serverError_t
@@ -34,7 +35,7 @@ typedef struct ST_accountsDB_t
 
 
 EN_transState_t recieveTransactionData(ST_transaction_t *transData);
-EN_serverError_t isValidAccount(ST_cardData_t *cardData, ST_accountsDB_t *accountRefrence);
+EN_serverError_t isValidAccount(ST_cardData_t *cardData, ST_accountsDB_t **accountRefrence);
 EN_serverError_t isBlockedAccount(ST_accountsDB_t *accountRefrence);
 EN_serverError_t isAmountAvailable(ST_terminalData_t *termData, ST_accountsDB_t *accountRefrence);
 EN_serverError_t saveTransaction(ST_transaction_t *transData);

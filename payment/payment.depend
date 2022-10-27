@@ -39,3 +39,43 @@
 	"../server/server.h"
 	"application.h"
 
+1666884193 source:f:\workshop\github\payment_project\payment\application\application.c
+	<stdio.h>
+	"../card/card.h"
+	"../terminal/terminal.h"
+	"../server/server.h"
+	"application.h"
+
+1666877611 f:\workshop\github\payment_project\payment\card\card.h
+
+1666880528 f:\workshop\github\payment_project\payment\terminal\terminal.h
+
+1666894294 f:\workshop\github\payment_project\payment\server\server.h
+
+1666818854 f:\workshop\github\payment_project\payment\application\application.h
+
+1666890253 source:f:\workshop\github\payment_project\payment\card\card.c
+	"card.h"
+	<string.h>
+	<stdio.h>
+
+1666888783 source:f:\workshop\github\payment_project\payment\source.c
+	<stdio.h>
+	"card/card.h"
+	"terminal/terminal.h"
+	"server/server.h"
+	"application/application.h"
+
+1666882410 source:f:\workshop\github\payment_project\payment\terminal\terminal.c
+	<stdio.h>
+	<string.h>
+	"../card/card.h"
+	"terminal.h"
+
+1666894420 source:f:\workshop\github\payment_project\payment\server\server.c
+	<stdio.h>
+	<string.h>
+	"../card/card.h"
+	"../terminal/terminal.h"
+	"server.h"
+
